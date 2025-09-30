@@ -1,0 +1,512 @@
+/**
+ * LMS Styles for EIA Theme
+ *
+ * @package EIA_Theme
+ */
+
+/* ============================================================================
+   LMS Dashboard Styles
+   ============================================================================ */
+
+.lms-dashboard {
+    padding: 2rem 0;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.stat-card-icon.blue {
+    background-color: rgba(45, 79, 179, 0.1);
+    color: #2D4FB3;
+}
+
+.stat-card-icon.orange {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+}
+
+.stat-card-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2D4FB3;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card-label {
+    color: #6B7280;
+    font-size: 0.875rem;
+}
+
+/* ============================================================================
+   Course Card Styles
+   ============================================================================ */
+
+.course-card {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.course-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.course-card-image {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.course-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.course-card:hover .course-card-image img {
+    transform: scale(1.05);
+}
+
+.course-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.course-badge.featured {
+    background-color: #F59E0B;
+    color: white;
+}
+
+.course-badge.new {
+    background-color: #10B981;
+    color: white;
+}
+
+.course-card-content {
+    padding: 1.25rem;
+}
+
+.course-category {
+    color: #F59E0B;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.course-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.course-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6B7280;
+}
+
+.course-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.course-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.course-rating-stars {
+    color: #FCD34D;
+}
+
+.course-progress {
+    margin-top: 1rem;
+}
+
+.course-progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #E5E7EB;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.course-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2D4FB3, #60A5FA);
+    transition: width 0.3s ease;
+}
+
+.course-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2D4FB3;
+}
+
+/* ============================================================================
+   Lesson Styles
+   ============================================================================ */
+
+.lesson-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lesson-item {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.lesson-item:hover {
+    border-color: #2D4FB3;
+    box-shadow: 0 2px 4px rgba(45, 79, 179, 0.1);
+}
+
+.lesson-item.completed {
+    background-color: #F0FDF4;
+    border-color: #10B981;
+}
+
+.lesson-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.lesson-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #EFF6FF;
+    color: #2D4FB3;
+}
+
+.lesson-item.completed .lesson-icon {
+    background-color: #D1FAE5;
+    color: #10B981;
+}
+
+.lesson-title {
+    font-weight: 600;
+    color: #1F2937;
+    margin-bottom: 0.25rem;
+}
+
+.lesson-duration {
+    font-size: 0.875rem;
+    color: #6B7280;
+}
+
+.lesson-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ============================================================================
+   Quiz Styles
+   ============================================================================ */
+
+.quiz-container {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-question {
+    margin-bottom: 2rem;
+}
+
+.question-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1F2937;
+    margin-bottom: 1rem;
+}
+
+.quiz-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.quiz-answer {
+    padding: 1rem;
+    border: 2px solid #E5E7EB;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quiz-answer:hover {
+    border-color: #2D4FB3;
+    background-color: #EFF6FF;
+}
+
+.quiz-answer.selected {
+    border-color: #2D4FB3;
+    background-color: #DBEAFE;
+}
+
+.quiz-answer.correct {
+    border-color: #10B981;
+    background-color: #D1FAE5;
+}
+
+.quiz-answer.incorrect {
+    border-color: #EF4444;
+    background-color: #FEE2E2;
+}
+
+/* ============================================================================
+   Certificate Styles
+   ============================================================================ */
+
+.certificate-container {
+    background: white;
+    border: 8px double #2D4FB3;
+    padding: 3rem;
+    text-align: center;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.certificate-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2D4FB3;
+    margin-bottom: 1rem;
+}
+
+.certificate-recipient {
+    font-size: 1.5rem;
+    margin: 2rem 0;
+}
+
+.certificate-course {
+    font-size: 1.25rem;
+    color: #F59E0B;
+    font-weight: 600;
+}
+
+/* ============================================================================
+   User Avatar
+   ============================================================================ */
+
+.avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2D4FB3, #60A5FA);
+    color: white;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* ============================================================================
+   Notifications
+   ============================================================================ */
+
+.notifications-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-top: 0.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid #E5E7EB;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+    background-color: #F9FAFB;
+}
+
+.notification-item.unread {
+    background-color: #EFF6FF;
+}
+
+.notification-title {
+    font-weight: 600;
+    color: #1F2937;
+    margin-bottom: 0.25rem;
+}
+
+.notification-message {
+    font-size: 0.875rem;
+    color: #6B7280;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    margin-top: 0.5rem;
+}
+
+/* ============================================================================
+   Responsive Design
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card-value {
+        font-size: 1.5rem;
+    }
+
+    .course-card-content {
+        padding: 1rem;
+    }
+
+    .certificate-container {
+        padding: 1.5rem;
+    }
+
+    .certificate-title {
+        font-size: 1.75rem;
+    }
+}
+
+/* ============================================================================
+   Loading States
+   ============================================================================ */
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(45, 79, 179, 0.2);
+    border-top-color: #2D4FB3;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================================================
+   Utility Classes
+   ============================================================================ */
+
+.btn-primary {
+    background-color: #2D4FB3;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #1e40af;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #F59E0B;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #d97706;
+    transform: translateY(-1px);
+}
+
+.text-eia-blue {
+    color: #2D4FB3;
+}
+
+.text-eia-orange {
+    color: #F59E0B;
+}
+
+.bg-eia-blue {
+    background-color: #2D4FB3;
+}
+
+.bg-eia-orange {
+    background-color: #F59E0B;
+}

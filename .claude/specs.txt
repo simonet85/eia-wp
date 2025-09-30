@@ -1,0 +1,98 @@
+**APPEL D'OFFRE : DEVELOPPEMENT D'UNE PLATEFORME E-LEARNING SOUS L'ENVIRONNEMENT WORDPRESS**
+
+# Préambule
+
+La deuxième phase du projet « Observation de la Terre pour une Gestion Durable des Terres et de l'Eau en Afrique du Nord » porté par l'Observatoire du Sahel et du Sahara (OSS), s'inscrit dans la continuité de la première phase et vise à aborder et résoudre les défis en Afrique du Nord ainsi qu'à contribuer à une gestion plus durable de l'eau et des ressources naturelles et à la lutte contre le changement climatique sur la base des applications des sciences et technologies spatiales.
+
+L'objectif global de ce projet est d'appuyer la prise de décision dans le domaine de la gestion durable des ressources naturelles et de l'eau grâce à des produits et services basés sur les données et techniques d'Observation de la Terre (OT). Cet objectif est décliné comme suit :
+
+- - Développer et maintenir des services d'aide à la décision pour les gestionnaires des ressources naturelles et de l'eau ;
+    - Dynamiser la coopération régionale et promouvoir l'échange de savoir-faire sur les ressources naturelles et la gestion de l'eau en Afrique du Nord ; et
+    - Renforcer les capacités et sensibiliser tous les partenaires et utilisateurs finaux sur le potentiel et assurer une meilleure prise en compte des données techniques et des applications d'Observation de la Terre.
+
+C'est dans ce sens, Le CRASTE-LF étant membre dans le projet chargé de la formation des formateurs, lance un appel pour le développement d'une plateforme e-learning pour abriter des Moocs et des modules de formation en OT appliquée à la gestion des ressources naturelles au profit de différentes cibles : grand public, les formateurs partenaires et les end users.
+
+# Descriptif technique spécifique
+
+| **Fonctionnalité** | **Description** |
+| --- | --- |
+| **Module Administration** |     |
+| Gérer des comptes | Chercher, modifier, supprimer des comptes utilisateurs, et effectuer des actions par lot |
+| Gérer des rôles et permission | Un rôle est un ensemble de permissions défini et valable globalement pour un site WORDPRESS LEARNING. Il peut ainsi être attribué à des utilisateurs spécifiques dans des contextes spécifiques. La combinaison des rôles et des contextes définit dans quelle mesure un utilisateur est autorisé à effectuer une action sur une page. Les exemples de rôles les plus connus sont celui |
+
+|     | d'enseignant et d'étudiant dans le contexte d'un cours. Un administrateur peut :<br><br>Ajouter des rôles personnalisés ou modifier des rôles existants. Lister et consulter le détail d'un rôle<br><br>Attribuer un rôle à un utilisateur Importer / exporter des rôles |
+| --- | --- |
+| Gérer des méthodes d'authentification | Un administrateur peut définir/exiger la ou les méthodes d'authentification à utiliser parmi ceux disponibles (Comptes manuelles, SSO, Externe …) |
+| Gérer l'apparence de la plateforme | Installer, choisir et personnaliser un thème.<br><br>Personnaliser l'apparence des composants principales (Logo, Dashboard, blogs, calendrier, profil) |
+| Gérer les paramétrage globale des plugins | Installer et configurer des modules complémentaires (Plugin) permettant l'ajout de nouvelles fonctionnalités |
+| Gérer des langues | Configurer la langue d'apprentissage pour les utilisateurs et les organisations. |
+| Initialiser les données de référence et les paramètres fonctionnels | Un administrateur peut :<br><br>Créer des catégories de cours Créer / Importer des cours<br><br>Associer les catégories à un ou plusieurs cours Définir les paramètres par défauts des cours<br><br>Activer / Désactiver les demandes de nouveaux cours Enrichir la structure de données du cours par des champs supplémentaires<br><br>Paramétrer les barèmes<br><br>Paramétrer le mode d'affichage des carnets de notes Importer un référentiel de compétences<br><br>Editer le paramétrage fonctionnel des modules supplémentaires |
+| **Module Gestion des cours** |     |
+| Concevoir et gérer des cours | Un cours dans WORDPRESS LEARNING est un emplacement dans lequel un enseignant pourra ajouter des ressources et des activités que les étudiants pourront réaliser.<br><br>Un administrateur (ou utilisateur ayant le rôle créateur de cours ou gestionnaire) peut :<br><br>Créer un nouveau cours<br><br>Créer (ou modifier) de nombreux cours à l'aide d'un fichier CSV Organiser les cours dans une hiérarchie spécifique.<br><br>Contrôler l'apparence d' un cours pour les participants. Organiser la page d'accueil d'un nouveau cours.<br><br>Restreindre l'accès à des éléments de cours. |
+| Ajouter, Modifier, Supprimer une activité dans un cours | Après la création d'un cours, les enseignants peuvent ensuite ajouter des ressources et des activités d'apprentissage dans le cours. |
+
+|     | **Il y a 14 activités différentes livrées en standard avec** WORDPRESS LEARNING<br><br>**:**<br><br>Atelier - permet l'évaluation par les pairs<br><br>Base de données - permet aux participants de créer, maintenir et rechercher une banque de fiches<br><br>Chat - permet aux participants d'avoir une discussion synchrone en temps réel<br><br>Consultation - permet de recueillir des données auprès des élèves pour aider les enseignants à connaître leur classe et réfléchir sur leur propre enseignement. Les consultations sont prédéfinies (non modifiables)<br><br>Devoir - permet aux enseignants de noter et faire des commentaires sur des fichiers déposés par les étudiants, ou une réalisation faite en ligne ou hors ligne<br><br>Feedback - permet de créer et réaliser des enquêtes afin de recueillir les commentaires<br><br>Forum - permet aux participants d'avoir des discussions asynchrones<br><br>Glossaire - permet aux participants de créer et de maintenir une liste de définitions, comme un dictionnaire<br><br>Leçon - permet de délivrer du contenu de manière flexible, en suivant différents parcours programmables<br><br>Outil externe - permet aux participants d'interagir avec des ressources d'apprentissage conformes LTI et des activités sur d'autres sites Web<br><br>Paquetage SCORM - permet d'intégrer des paquets SCORM dans le contenu des cours<br><br>Sondage - permet à un enseignant de poser une question et donne un choix de réponses multiples<br><br>Test - permet à l'enseignant de concevoir et d'inclure des tests (quiz), qui peuvent intégrer les réponses correctes et/ou un feedback automatique<br><br>Wiki - une collection de pages web que n'importe qui peut créer ou modifier |
+| --- | --- |
+| Ajouter, Supprimer une ressource dans un cours | Une ressource est un élément que l'enseignant peut utiliser pour soutenir l'apprentissage, telle qu'un fichier ou un lien. WORDPRESS LEARNING supporte plusieurs types de ressources que les enseignants peuvent ajouter à leurs sections de cours.<br><br>Un enseignant peut ajouter les types de ressources suivants : Dossier - les dossiers peuvent aider à organiser les fichiers et un dossier peut contenir des sous dossiers.<br><br>Étiquette - permet d'afficher des informations dans une section : quelques mots ou une image pour séparer des ressources et/ou activités, ou une longue description ou des instructions.<br><br>Fichier - une image, un document PDF, un tableur, un fichier son, un fichier vidéo. |
+
+|     | Livre - créer des pages organisées entre elles par chapitres, à la manière d'un livre.<br><br>Page - l'élève voit une page que l'enseignant crée avec l'éditeur HTML.<br><br>Paquetage IMS content - ajouter du contenu statique provenant d'autres sources, au format standard IMS<br><br>URL - pour envoyer l'apprenant à n'importe quel endroit atteignable avec le navigateur Web. Flickr, Youtube, Wikipedia ou cette page de documentation sont quelques exemples |
+| --- | --- |
+| Ajouter, Supprimer un bloc | Les blocs sont des zones d'informations supplémentaires qui peuvent être ajouté sur les côtés d'un cours.<br><br>Un enseignant peut ajouter des blocs standards disponibles dans WORDPRESS LEARNING, à titre d'exemple :<br><br>Bloc Activité récente<br><br>Bloc Articles de blog récents Bloc Auto-achèvement<br><br>Bloc Dernières annonces<br><br>... |
+| Créer, Modifier, Supprimer, Importer , Exporter des questions | WORDPRESS LEARNING offre beaucoup de flexibilité aux enseignants lors de la création de types de questions communs. Vous pouvez créer des questions à réponse simple et à réponses multiple, inclure des images du son ou un autre média dans la question et/ou dans la réponse (en insérant du code HTML) et pondérer les réponses individuelle.<br><br>Les questions peuvent être utilisées dans les activités et les leçons.<br><br>Les type de questions supportés par WORDPRESS LEARNING LEARNING : Question à choix multiples<br><br>Question vrai ou faux Question appariement Question à réponse courte Question numérique Question composition Question calculée<br><br>Question calculée à choix multiples Question calculée simple<br><br>Question glisser-déposer sur texte Question glisser-déposer sur image Question marqueurs à glisser-déposer Question cloze à réponses intégrées<br><br>Question d'appariement aléatoire à réponse courte Question sélectionner les mots manquants Question description |
+
+|     | Questions à réponse courte avec expressions régulières |
+| --- | --- |
+| S'inscrire dans un cours | L'inscription est le processus de désigner des utilisateurs (déjà authentifiés sur la plateforme) comme participants à un cours. Cela inclut tant les étudiants que les enseignants : Administrateur ou enseignant du cours peut inscrire les utilisateurs manuellement.<br><br>Un utilisateur peut choisir de s'inscrire lui-même dans un cours. |
+| Créer, Modifier, Supprimer, des groupes | Au niveau d'un cours, les utilisateurs peuvent devenir membres d'un ou plusieurs groupes. Les groupes permettent de restreindre l'accès à certaines activités aux membres d'un groupe. Par exemple, un forum pourra être ouvert uniquement aux membres d'un groupe (d'une équipe de travail). |
+| Gestion des notes | Les notes peuvent être éditées dans la page devoir ou dans le carnet de notes. Le carnet de notes est composé d'éléments de note ayant été collectés de plusieurs évaluations sur Moodle et permet de les examiner/modifier ainsi que les organiser en catégories afin de calculer les totaux de multiples manières.<br><br>L'enseignant peut :<br><br>Editer les notes<br><br>Importer / Exporter les notes en formats csv/xml Afficher le carnet des notes<br><br>Cacher les notes et les commentaires jusqu'à ce que la correction soit terminé et finalisé<br><br>Révéler les notes et les commentaires aux étudiants manuellement ou d'une manière planifiée<br><br>Paramétrer la formule de calcule des notes dans le carnet des notes<br><br>Consulter / Télécharger l'historique d'évaluation pour une période donnée<br><br>Créer, modifier et utiliser un barème<br><br>Définir, modifier, évaluer des objectifs (habiletés, savoir-faire, compétences)<br><br>Paramétrer la méthode d'évaluation des devoirs (évaluation simple, grille d'évaluation avancée, guide d'évaluation avancée) |
+| Suivre le progrès | Il y a diverses façons de suivre le progrès des étudiants dans Moodle.<br><br>Un enseignant peut :<br><br>Spécifier les conditions d'achèvement des activités et des cours Consulter des rapports pour suivre le progrès des étudiants (Rapport de compétences, Participation au cours, Rapport d'ensemble, Statistiques, Historiques, Surveillance d'événements) |
+| Recycler une activité / un cours | Faire une copie d'une ressource ou d'une activité d'un cours en vue d'une réutilisation dans un autre cours<br><br>Dupliquer un cours |
+
+| **Module Apprenant** |     |
+| --- |     | --- |
+| Créer un compte / S'inscrire | L'apprenant peut créer son compte et s'inscrire dans des cours disponibles |
+| S'authentifier | L'apprenant peut s'authentifier avec plusieurs méthodes (authentification standard , SSO, Anonymous, Google/Facebook/Microsoft) |
+| Consulter le contenu de la page principale et les différents blocs | L'apprenant peut naviguer et consulter l'ensemble du contenu de la page principale et des autres blocs |
+| Visualiser et personnaliser son Dashboard | L'apprenant peut visualiser et personnaliser son Dashbord |
+| Gérer son calendrier | L'apprenant peut :<br><br>Voir les événements à venir<br><br>Créer des événements dans son calendrier Filtrer les événements par cours<br><br>Définir des rappels d'événements |
+| Consulter les notifications | L'apprenant peut consulter ses notifications et les marquer comme lues |
+| Consulter le parcours d'apprentissage | L'apprenant peut consulter son parcours d'apprentissage et ses compétences acquises |
+| Commenter , noter un contenu | L'apprenant peut :<br><br>Consulter/Ajouter/Supprimer un commentaire sur un contenu Noter un contenu |
+| Consulter et participer dans des conversations | L'apprenant peut :<br><br>Initier un chat privé<br><br>Participer dans des conversations groupe Bloquer une conversation<br><br>Chercher un contact |
+| Rechercher et naviguer dans la liste des cours | L'apprenant peut rechercher un cours par mot clé ou par d'autres critères avancés |
+| Consulter les participants d'un cours | L'apprenant peut rechercher , consulter et filtrer les participants d'un cours |
+| Afficher l'état d'achèvement d'un cours ou activité | L'apprenant peut consulter l'état d'achèvement d'un cours ou activité |
+| Marquer le cours ou les activités comme terminés | L'apprenant peut marquer le cours ou les activités comme terminés |
+| Consulter les ressources et activités | L'apprenant peut consulter les fichiers, les livres, les URLs et toute autre activité/ressource |
+
+| Soumettre, Resoumettre un devoir | L'apprenant peut soumettre un devoir, éditer et supprimer la soumission.<br><br>Il peut consulter le grade attribué à sa soumission et éventuellement resoumettre le devoir. |
+| --- | --- |
+| Consulter et répondre aux questions d'un Quiz | L'apprenant peut consulter et démarrer une activité Quiz |
+| Passer en revu les réponses et résultats précédents d'un Quiz | L'apprenant peut consulter les réponses et résultats précédents d'un Quiz |
+| Participer et voir le résultat d'un sondage | L'apprenant peut participer et voir le résultat d'un sondage |
+| **Module Reporting** |     |
+| Visualiser et générer des rapports sur l'activité et la participation au niveau du cours et du site. | Rapports d'activité pour le cours ou le site Liste des commentaires créés<br><br>Liste de toutes les sauvegardes de cours effectuées Les pistes d'audits<br><br>Editer / personnaliser un nouveau rapport |
+| **Modules Transverses** |     |
+| Notifier les utilisateurs suite à des événements ou alertes | les utilisateurs peuvent recevoir des alertes automatiques sur les nouvelles affectations et les nouvelles échéances, les messages du forum et aussi s'envoyer des messages privés les uns aux autres. |
+| Gérer des contenus numériques | Offre une gamme de méthodes pour importer, exporter et gérer des contenus numériques de toute nature afin de permettre et de soutenir l'apprentissage :<br><br>Déposer des fichiers et des dossiers dans WORDPRESS LEARNING.<br><br>Importer du contenu dans Moodle à partir de sites externes tels que Flickr, Youtube, Google docs...<br><br>Gérer des médias (images, son, vidéo et des contenus intégrés) Vérifier que le travail soumis par les élèves n'est pas copié (Prévention du plagiat via des modules complémentaires) |
+| Accéder à la plateforme via un canal mobile | Moodle offre une application mobile mlti-device (iOS, Adroid, Windows) pour les enseignants et les étudiants.<br><br>L'application mobile offre plusieurs fonctionnalités disponibles dans la version web , à titre d'exemple :<br><br>Consulter vos cours même en étant hors-ligne.<br><br>Recevoir des notifications de messages et autres événements. Trouver et contacter les autres membres de votre cours.<br><br>Mettre en ligne des images, audios, vidéos et autres fichiers. Voir les notes obtenues dans les cours. |
+
+- **Hébergement en mode VPS avec la configuration suivante**
+
+- CPU : 6 vCPU Cores
+- RAM : 16 GB RAM
+- Disque : 600 GB SSDs
+
+# Soumission
+
+L'intéressé devrait envoyer ou déposer au siège du CRASTE-LF une offre technique et une offre financière séparées avant le 04 Octobre.
+
+# Echéancier de facturation
+
+50% au démarrage du projet 40% à la livraison en production
+
+10% après la période de garantie (3 mois)
+
+# Echéancier de paiement
+
+30 jours après envoi de la facture

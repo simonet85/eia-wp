@@ -1,0 +1,19 @@
+# Ignore WordPress core
+wp-admin/
+wp-includes/
+wp-content/languages/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/uploads/
+
+# Keep only themes and plugins
+!wp-content/themes/**/*
+!wp-content/plugins/**/*
+
+# Ignore vendor, node, logs, system
+vendor/
+node_modules/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
