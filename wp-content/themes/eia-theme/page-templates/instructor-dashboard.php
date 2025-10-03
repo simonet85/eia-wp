@@ -87,7 +87,23 @@ body.admin-bar {
                         <p style="margin: 0; color: rgba(255,255,255,0.9); font-size: 1.125rem;">Tableau de bord formateur</p>
                     </div>
                 </div>
-                <div>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="<?php echo site_url('/analytics-instructeur/'); ?>" style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        padding: 0.875rem 1.75rem;
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        font-size: 1rem;
+                        transition: all 0.3s;
+                        border: 2px solid rgba(255,255,255,0.3);
+                    " onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.borderColor='rgba(255,255,255,0.5)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.borderColor='rgba(255,255,255,0.3)'">
+                        <i class="fas fa-chart-line"></i> Analytics
+                    </a>
                     <a href="<?php echo admin_url('post-new.php?post_type=lp_course'); ?>" style="
                         display: inline-flex;
                         align-items: center;
@@ -101,7 +117,7 @@ body.admin-bar {
                         font-size: 1rem;
                         transition: all 0.3s;
                         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'">
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.15)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'">
                         <i class="fas fa-plus-circle"></i> Créer un cours
                     </a>
                 </div>
