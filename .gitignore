@@ -30,7 +30,7 @@ debug.log
 Thumbs.db
 NUL
 
-# Diagnostic scripts (optional - exclude test utilities)
+# Diagnostic and setup scripts (exclude test utilities)
 check-*.php
 debug-*.php
 verify-*.php
@@ -39,6 +39,14 @@ enroll-*.php
 create-*.php
 flush-*.php
 fix-*.php
+force-*.php
+generate-*.php
+install-*.php
+recreate-*.php
+setup-*.php
+trace-*.php
+activate-*.php
+*.html
 
 # IDE and editor files
 .vscode/
@@ -60,3 +68,8 @@ package-lock.json
 # Composer
 vendor/
 composer.lock
+
+# Test files and email logs
+*.eml
+.claude/*.eml
+.claude/*.pdf
