@@ -42,25 +42,27 @@ class EIA_Notifications {
             return;
         }
 
-        // Register notification callbacks
-        add_action('bp_setup_globals', array($this, 'register_notification_callbacks'));
+        // Register notification format callbacks for each component
+        add_filter('bp_notifications_get_notifications_for_user', array($this, 'format_notifications_filter'), 10, 8);
+
+        // Register callback for each component via the registered_components filter
+        add_filter('bp_notifications_get_registered_components', array($this, 'register_components'));
 
         // Hooks pour générer des notifications automatiques
         $this->register_notification_triggers();
-
-        // Email notifications (optionnel)
-        add_filter('bp_notifications_get_notifications_for_user', array($this, 'format_notifications'), 10, 8);
     }
 
     /**
-     * Register notification format callbacks with BuddyPress
+     * Register our components with BuddyPress
      */
-    public function register_notification_callbacks() {
-        // Register component
-        buddypress()->eia_notifications = new stdClass();
-        buddypress()->eia_notifications->id = 'eia_notifications';
-        buddypress()->eia_notifications->slug = 'eia-notifications';
-        buddypress()->eia_notifications->notification_callback = array($this, 'format_notifications');
+    public function register_components($component_names = array()) {
+        $component_names[] = self::COMPONENT_ASSIGNMENT;
+        $component_names[] = self::COMPONENT_FORUM;
+        $component_names[] = self::COMPONENT_COURSE;
+        $component_names[] = self::COMPONENT_GAMIFICATION;
+        $component_names[] = self::COMPONENT_CERTIFICATE;
+
+        return $component_names;
     }
 
     /**
@@ -122,31 +124,30 @@ class EIA_Notifications {
     }
 
     /**
-     * Format notifications for display
+     * Format notifications for display via BuddyPress filter
      */
-    public function format_notifications($action, $item_id, $secondary_item_id, $total_items, $format = 'string', $component_action, $component_name, $id) {
-        // Assignment notifications
+    public function format_notifications_filter($action, $item_id, $secondary_item_id, $total_items, $format = 'string', $component_action = '', $component_name = '', $id = 0) {
+        // Only process our custom components
+        if (!in_array($component_name, array(
+            self::COMPONENT_ASSIGNMENT,
+            self::COMPONENT_FORUM,
+            self::COMPONENT_COURSE,
+            self::COMPONENT_GAMIFICATION,
+            self::COMPONENT_CERTIFICATE
+        ))) {
+            return $action;
+        }
+
+        // Get formatted text based on component
         if ($component_name === self::COMPONENT_ASSIGNMENT) {
             return $this->format_assignment_notification($component_action, $item_id, $secondary_item_id, $total_items, $format, $id);
-        }
-
-        // Forum notifications
-        if ($component_name === self::COMPONENT_FORUM) {
+        } elseif ($component_name === self::COMPONENT_FORUM) {
             return $this->format_forum_notification($component_action, $item_id, $secondary_item_id, $total_items, $format, $id);
-        }
-
-        // Course notifications
-        if ($component_name === self::COMPONENT_COURSE) {
+        } elseif ($component_name === self::COMPONENT_COURSE) {
             return $this->format_course_notification($component_action, $item_id, $secondary_item_id, $total_items, $format, $id);
-        }
-
-        // Gamification notifications
-        if ($component_name === self::COMPONENT_GAMIFICATION) {
+        } elseif ($component_name === self::COMPONENT_GAMIFICATION) {
             return $this->format_gamification_notification($component_action, $item_id, $secondary_item_id, $total_items, $format, $id);
-        }
-
-        // Certificate notifications
-        if ($component_name === self::COMPONENT_CERTIFICATE) {
+        } elseif ($component_name === self::COMPONENT_CERTIFICATE) {
             return $this->format_certificate_notification($component_action, $item_id, $secondary_item_id, $total_items, $format, $id);
         }
 
