@@ -94,6 +94,7 @@ class EIA_LMS_Core {
         require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-certificates.php';
         require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-forum.php';
         require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-calendar.php';
+        require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-messaging.php';
     }
 
     /**
@@ -118,6 +119,7 @@ class EIA_LMS_Core {
         EIA_Certificates::get_instance();
         EIA_Forum::get_instance();
         EIA_Calendar::get_instance();
+        EIA_Messaging::get_instance();
 
         do_action('eia_lms_core_loaded');
     }
