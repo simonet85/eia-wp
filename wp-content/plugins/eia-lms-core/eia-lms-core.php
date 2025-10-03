@@ -116,6 +116,8 @@ class EIA_LMS_Core {
         EIA_Notifications::get_instance();
         EIA_Gamification::get_instance();
         EIA_Certificates::get_instance();
+        EIA_Forum::get_instance();
+        EIA_Calendar::get_instance();
 
         do_action('eia_lms_core_loaded');
     }

@@ -2,11 +2,11 @@
 /**
  * EIA Notifications System
  *
- * Handles email notifications for various events:
- * - Assignment submissions
- * - Assignment grading
- * - Course enrollment
- * - Course completion
+ * Système de notifications en temps réel pour les étudiants et instructeurs
+ * - Notifications in-app avec badge de compteur
+ * - Notifications email (instantanées ou digest)
+ * - Préférences par type de notification
+ * - Marquer comme lu/non-lu
  *
  * @package EIA_LMS_Core
  */
@@ -31,353 +31,676 @@ class EIA_Notifications {
     }
 
     private function init_hooks() {
-        // Set HTML email content type
-        add_filter('wp_mail_content_type', array($this, 'set_html_content_type'));
+        // AJAX handlers
+        add_action('wp_ajax_eia_get_notifications', array($this, 'ajax_get_notifications'));
+        add_action('wp_ajax_eia_mark_notification_read', array($this, 'ajax_mark_read'));
+        add_action('wp_ajax_eia_mark_all_read', array($this, 'ajax_mark_all_read'));
+        add_action('wp_ajax_eia_delete_notification', array($this, 'ajax_delete_notification'));
+        add_action('wp_ajax_eia_get_unread_count', array($this, 'ajax_get_unread_count'));
+
+        // Admin bar notification badge
+        add_action('admin_bar_menu', array($this, 'add_notification_badge'), 999);
+
+        // Enqueue scripts
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
+
+        // Hooks pour générer des notifications automatiques
+        $this->register_notification_triggers();
+
+        // Cron pour les emails digest
+        add_action('eia_send_notification_digest', array($this, 'send_daily_digest'));
+        if (!wp_next_scheduled('eia_send_notification_digest')) {
+            wp_schedule_event(strtotime('tomorrow 8:00'), 'daily', 'eia_send_notification_digest');
+        }
     }
 
     /**
-     * Set email content type to HTML
+     * Create notifications table
      */
-    public function set_html_content_type() {
-        return 'text/html';
-    }
-
-    /**
-     * Send notification when assignment is graded
-     *
-     * @param int $submission_id The submission ID
-     * @param float $grade The grade given
-     * @param string $feedback Instructor feedback
-     */
-    public function notify_assignment_graded($submission_id, $grade, $feedback) {
+    public static function create_table() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'eia_assignment_submissions';
+        $table_name = $wpdb->prefix . 'eia_notifications';
+        $charset_collate = $wpdb->get_charset_collate();
 
-        // Get submission details
-        $submission = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM $table_name WHERE id = %d",
-            $submission_id
-        ));
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            type varchar(50) NOT NULL,
+            title varchar(255) NOT NULL,
+            message text NOT NULL,
+            action_url varchar(500) DEFAULT NULL,
+            icon varchar(50) DEFAULT 'bell',
+            is_read tinyint(1) DEFAULT 0,
+            email_sent tinyint(1) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            read_at datetime DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY user_id (user_id),
+            KEY is_read (is_read),
+            KEY created_at (created_at),
+            KEY type (type)
+        ) $charset_collate;";
 
-        if (!$submission) {
-            return false;
-        }
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
 
-        // Get student info
-        $student = get_userdata($submission->user_id);
-        if (!$student) {
-            return false;
-        }
+        // Table des préférences
+        $prefs_table = $wpdb->prefix . 'eia_notification_preferences';
+        $sql_prefs = "CREATE TABLE IF NOT EXISTS $prefs_table (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            notification_type varchar(50) NOT NULL,
+            in_app tinyint(1) DEFAULT 1,
+            email_instant tinyint(1) DEFAULT 0,
+            email_digest tinyint(1) DEFAULT 1,
+            PRIMARY KEY (id),
+            UNIQUE KEY user_type (user_id, notification_type)
+        ) $charset_collate;";
 
-        // Get assignment info
-        $assignment = get_post($submission->assignment_id);
-        if (!$assignment) {
-            return false;
-        }
-
-        $max_grade = get_post_meta($assignment->ID, '_assignment_max_grade', true);
-
-        // Get instructor info
-        $grader = get_userdata($submission->graded_by);
-        $grader_name = $grader ? $grader->display_name : 'Votre instructeur';
-
-        // Prepare email
-        $to = $student->user_email;
-        $subject = 'Votre devoir a été noté - ' . $assignment->post_title;
-
-        $message = $this->get_email_template('assignment_graded', array(
-            'student_name' => $student->display_name,
-            'assignment_title' => $assignment->post_title,
-            'grade' => $grade,
-            'max_grade' => $max_grade,
-            'feedback' => $feedback,
-            'grader_name' => $grader_name,
-            'assignment_url' => get_permalink($assignment->ID),
-            'dashboard_url' => site_url('/mes-cours/')
-        ));
-
-        // Send email
-        return wp_mail($to, $subject, $message);
+        dbDelta($sql_prefs);
     }
 
     /**
-     * Send notification when assignment is submitted
-     *
-     * @param int $submission_id The submission ID
+     * Register notification triggers for various events
      */
-    public function notify_assignment_submitted($submission_id) {
+    private function register_notification_triggers() {
+        // Devoir soumis (notifier l'instructeur)
+        add_action('eia_assignment_submitted', array($this, 'notify_assignment_submitted'), 10, 3);
+
+        // Devoir noté (notifier l'étudiant)
+        add_action('eia_assignment_graded', array($this, 'notify_assignment_graded'), 10, 3);
+
+        // Nouvelle réponse au forum (notifier l'auteur du topic)
+        add_action('eia_forum_reply_created', array($this, 'notify_forum_reply'), 10, 3);
+
+        // Réponse marquée comme meilleure (notifier l'auteur)
+        add_action('eia_forum_best_answer_marked', array($this, 'notify_best_answer'), 10, 3);
+
+        // Nouveau cours disponible (notifier tous les étudiants)
+        add_action('publish_lp_course', array($this, 'notify_new_course'), 10, 2);
+
+        // Certificat obtenu (notifier l'étudiant)
+        add_action('eia_certificate_earned', array($this, 'notify_certificate'), 10, 2);
+
+        // Points XP gagnés (notifier l'étudiant)
+        add_action('eia_xp_awarded', array($this, 'notify_xp_earned'), 10, 3);
+
+        // Badge débloqué (notifier l'étudiant)
+        add_action('eia_badge_earned', array($this, 'notify_badge_earned'), 10, 2);
+
+        // Rappel d'échéance de devoir (24h avant)
+        add_action('eia_assignment_reminder', array($this, 'notify_assignment_reminder'), 10, 2);
+    }
+
+    /**
+     * Create a notification
+     */
+    public function create_notification($user_id, $type, $title, $message, $action_url = null, $icon = 'bell') {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'eia_assignment_submissions';
 
-        // Get submission details
-        $submission = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM $table_name WHERE id = %d",
-            $submission_id
-        ));
+        // Vérifier les préférences de l'utilisateur
+        $prefs = $this->get_user_preferences($user_id, $type);
 
-        if (!$submission) {
-            return false;
+        // Créer notification in-app si activée
+        if ($prefs['in_app']) {
+            $wpdb->insert(
+                $wpdb->prefix . 'eia_notifications',
+                array(
+                    'user_id' => $user_id,
+                    'type' => $type,
+                    'title' => $title,
+                    'message' => $message,
+                    'action_url' => $action_url,
+                    'icon' => $icon,
+                ),
+                array('%d', '%s', '%s', '%s', '%s', '%s')
+            );
+
+            $notification_id = $wpdb->insert_id;
         }
 
-        // Get student info
-        $student = get_userdata($submission->user_id);
-        if (!$student) {
-            return false;
+        // Envoyer email instantané si activé
+        if ($prefs['email_instant']) {
+            $this->send_instant_email($user_id, $title, $message, $action_url);
         }
 
-        // Get assignment info
-        $assignment = get_post($submission->assignment_id);
-        if (!$assignment) {
-            return false;
-        }
-
-        // Get course info to find instructor
-        $course_id = get_post_meta($assignment->ID, '_assignment_course', true);
-        if (!$course_id) {
-            return false;
-        }
-
-        $course = get_post($course_id);
-        $instructor = get_userdata($course->post_author);
-
-        if (!$instructor) {
-            return false;
-        }
-
-        // Prepare email
-        $to = $instructor->user_email;
-        $subject = 'Nouveau devoir soumis - ' . $assignment->post_title;
-
-        $message = $this->get_email_template('assignment_submitted', array(
-            'instructor_name' => $instructor->display_name,
-            'student_name' => $student->display_name,
-            'assignment_title' => $assignment->post_title,
-            'course_title' => $course->post_title,
-            'submitted_date' => date('d/m/Y à H:i', strtotime($submission->submitted_date)),
-            'grading_url' => site_url('/notation-devoirs/?assignment_id=' . $assignment->ID),
-            'has_file' => !empty($submission->file_url),
-            'has_text' => !empty($submission->submission_text)
-        ));
-
-        // Send email
-        return wp_mail($to, $subject, $message);
+        return $notification_id ?? null;
     }
 
     /**
-     * Get email template
-     *
-     * @param string $template Template name
-     * @param array $data Template data
-     * @return string HTML email content
+     * Get user notification preferences
      */
-    private function get_email_template($template, $data) {
-        $templates = array(
-            'assignment_graded' => $this->template_assignment_graded($data),
-            'assignment_submitted' => $this->template_assignment_submitted($data),
+    private function get_user_preferences($user_id, $type) {
+        global $wpdb;
+
+        $prefs = $wpdb->get_row($wpdb->prepare(
+            "SELECT in_app, email_instant, email_digest
+            FROM {$wpdb->prefix}eia_notification_preferences
+            WHERE user_id = %d AND notification_type = %s",
+            $user_id, $type
+        ), ARRAY_A);
+
+        // Valeurs par défaut si pas de préférences
+        if (!$prefs) {
+            return array(
+                'in_app' => true,
+                'email_instant' => false,
+                'email_digest' => true
+            );
+        }
+
+        return $prefs;
+    }
+
+    /**
+     * Get notifications for a user
+     */
+    public function get_notifications($user_id, $limit = 20, $offset = 0, $unread_only = false) {
+        global $wpdb;
+
+        $where = $wpdb->prepare("user_id = %d", $user_id);
+        if ($unread_only) {
+            $where .= " AND is_read = 0";
+        }
+
+        $notifications = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}eia_notifications
+            WHERE $where
+            ORDER BY created_at DESC
+            LIMIT %d OFFSET %d",
+            $limit, $offset
+        ));
+
+        return $notifications;
+    }
+
+    /**
+     * Get unread count
+     */
+    public function get_unread_count($user_id) {
+        global $wpdb;
+
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}eia_notifications
+            WHERE user_id = %d AND is_read = 0",
+            $user_id
+        ));
+    }
+
+    /**
+     * Mark notification as read
+     */
+    public function mark_as_read($notification_id, $user_id = null) {
+        global $wpdb;
+
+        $where = array('id' => $notification_id);
+        if ($user_id) {
+            $where['user_id'] = $user_id;
+        }
+
+        return $wpdb->update(
+            $wpdb->prefix . 'eia_notifications',
+            array(
+                'is_read' => 1,
+                'read_at' => current_time('mysql')
+            ),
+            $where,
+            array('%d', '%s'),
+            array('%d')
+        );
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function mark_all_read($user_id) {
+        global $wpdb;
+
+        return $wpdb->update(
+            $wpdb->prefix . 'eia_notifications',
+            array(
+                'is_read' => 1,
+                'read_at' => current_time('mysql')
+            ),
+            array('user_id' => $user_id, 'is_read' => 0),
+            array('%d', '%s'),
+            array('%d', '%d')
+        );
+    }
+
+    /**
+     * Delete notification
+     */
+    public function delete_notification($notification_id, $user_id = null) {
+        global $wpdb;
+
+        $where = array('id' => $notification_id);
+        if ($user_id) {
+            $where['user_id'] = $user_id;
+        }
+
+        return $wpdb->delete(
+            $wpdb->prefix . 'eia_notifications',
+            $where,
+            array('%d')
+        );
+    }
+
+    /**
+     * AJAX: Get notifications
+     */
+    public function ajax_get_notifications() {
+        check_ajax_referer('eia-notifications-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => 'Non autorisé'));
+        }
+
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 20;
+        $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
+        $unread_only = isset($_POST['unread_only']) ? (bool) $_POST['unread_only'] : false;
+
+        $notifications = $this->get_notifications($user_id, $limit, $offset, $unread_only);
+        $unread_count = $this->get_unread_count($user_id);
+
+        wp_send_json_success(array(
+            'notifications' => $notifications,
+            'unread_count' => $unread_count
+        ));
+    }
+
+    /**
+     * AJAX: Mark notification as read
+     */
+    public function ajax_mark_read() {
+        check_ajax_referer('eia-notifications-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => 'Non autorisé'));
+        }
+
+        $notification_id = isset($_POST['notification_id']) ? intval($_POST['notification_id']) : 0;
+        if (!$notification_id) {
+            wp_send_json_error(array('message' => 'ID de notification invalide'));
+        }
+
+        $result = $this->mark_as_read($notification_id, $user_id);
+
+        if ($result !== false) {
+            $unread_count = $this->get_unread_count($user_id);
+            wp_send_json_success(array('unread_count' => $unread_count));
+        } else {
+            wp_send_json_error(array('message' => 'Erreur lors de la mise à jour'));
+        }
+    }
+
+    /**
+     * AJAX: Mark all as read
+     */
+    public function ajax_mark_all_read() {
+        check_ajax_referer('eia-notifications-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => 'Non autorisé'));
+        }
+
+        $this->mark_all_read($user_id);
+        wp_send_json_success(array('unread_count' => 0));
+    }
+
+    /**
+     * AJAX: Delete notification
+     */
+    public function ajax_delete_notification() {
+        check_ajax_referer('eia-notifications-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => 'Non autorisé'));
+        }
+
+        $notification_id = isset($_POST['notification_id']) ? intval($_POST['notification_id']) : 0;
+        if (!$notification_id) {
+            wp_send_json_error(array('message' => 'ID de notification invalide'));
+        }
+
+        $result = $this->delete_notification($notification_id, $user_id);
+
+        if ($result !== false) {
+            $unread_count = $this->get_unread_count($user_id);
+            wp_send_json_success(array('unread_count' => $unread_count));
+        } else {
+            wp_send_json_error(array('message' => 'Erreur lors de la suppression'));
+        }
+    }
+
+    /**
+     * AJAX: Get unread count
+     */
+    public function ajax_get_unread_count() {
+        check_ajax_referer('eia-notifications-nonce', 'nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(array('message' => 'Non autorisé'));
+        }
+
+        $count = $this->get_unread_count($user_id);
+        wp_send_json_success(array('count' => $count));
+    }
+
+    /**
+     * Add notification badge to admin bar
+     */
+    public function add_notification_badge($wp_admin_bar) {
+        if (!is_user_logged_in()) {
+            return;
+        }
+
+        $user_id = get_current_user_id();
+        $unread_count = $this->get_unread_count($user_id);
+
+        $badge_html = $unread_count > 0 ? ' <span class="eia-notification-badge">' . $unread_count . '</span>' : '';
+
+        $wp_admin_bar->add_node(array(
+            'id'    => 'eia-notifications',
+            'title' => '<i class="fas fa-bell"></i>' . $badge_html,
+            'href'  => '#',
+            'meta'  => array(
+                'class' => 'eia-notifications-menu',
+                'onclick' => 'return false;'
+            ),
+        ));
+    }
+
+    /**
+     * Enqueue scripts and styles
+     */
+    public function enqueue_scripts() {
+        if (!is_user_logged_in()) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'eia-notifications',
+            EIA_LMS_CORE_PLUGIN_URL . 'assets/css/notifications.css',
+            array(),
+            '1.0.0'
         );
 
-        return isset($templates[$template]) ? $templates[$template] : '';
+        wp_enqueue_script(
+            'eia-notifications',
+            EIA_LMS_CORE_PLUGIN_URL . 'assets/js/notifications.js',
+            array('jquery'),
+            '1.0.0',
+            true
+        );
+
+        wp_localize_script('eia-notifications', 'eiaNotifications', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('eia-notifications-nonce'),
+            'user_id' => get_current_user_id(),
+        ));
     }
 
     /**
-     * Email template: Assignment graded
+     * Send instant email notification
      */
-    private function template_assignment_graded($data) {
-        $percentage = ($data['grade'] / $data['max_grade']) * 100;
-        $grade_color = $percentage >= 70 ? '#10B981' : ($percentage >= 50 ? '#F59E0B' : '#EF4444');
+    private function send_instant_email($user_id, $title, $message, $action_url = null) {
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return false;
+        }
 
-        ob_start();
-        ?>
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Devoir noté</title>
-        </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f7;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f7; padding: 40px 20px;">
-                <tr>
-                    <td align="center">
-                        <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        $subject = '[EIA] ' . $title;
 
-                            <!-- Header -->
-                            <tr>
-                                <td style="background: linear-gradient(135deg, #2D4FB3 0%, #1e3a8a 100%); padding: 40px 30px; text-align: center;">
-                                    <h1 style="margin: 0; color: white; font-size: 28px; font-weight: 700;"><i class="fas fa-check-circle" style="margin-right: 10px;"></i>Devoir Noté</h1>
-                                    <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">École Internationale des Affaires</p>
-                                </td>
-                            </tr>
+        $body = "Bonjour {$user->display_name},\n\n";
+        $body .= strip_tags($message) . "\n\n";
 
-                            <!-- Content -->
-                            <tr>
-                                <td style="padding: 40px 30px;">
-                                    <p style="margin: 0 0 20px 0; font-size: 16px; color: #1f2937;">Bonjour <strong><?php echo esc_html($data['student_name']); ?></strong>,</p>
+        if ($action_url) {
+            $body .= "Voir les détails: {$action_url}\n\n";
+        }
 
-                                    <p style="margin: 0 0 30px 0; font-size: 16px; color: #1f2937; line-height: 1.6;">
-                                        Votre devoir <strong>"<?php echo esc_html($data['assignment_title']); ?>"</strong> a été noté par <?php echo esc_html($data['grader_name']); ?>.
-                                    </p>
+        $body .= "---\n";
+        $body .= "École Internationale des Affaires\n";
+        $body .= site_url();
 
-                                    <!-- Grade Card -->
-                                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 3px solid <?php echo $grade_color; ?>; border-radius: 12px; margin-bottom: 30px;">
-                                        <tr>
-                                            <td style="padding: 30px; text-align: center;">
-                                                <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Votre note</div>
-                                                <div style="font-size: 48px; font-weight: bold; color: <?php echo $grade_color; ?>; margin-bottom: 5px;">
-                                                    <?php echo number_format($data['grade'], 1); ?><span style="font-size: 24px; color: #9ca3af;">/<?php echo $data['max_grade']; ?></span>
-                                                </div>
-                                                <div style="font-size: 18px; color: #6b7280;">
-                                                    (<?php echo round($percentage); ?>%)
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-
-                                    <?php if (!empty($data['feedback'])) : ?>
-                                        <!-- Feedback -->
-                                        <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
-                                            <h3 style="margin: 0 0 10px 0; color: #1e40af; font-size: 16px; font-weight: 600;">Feedback de l'instructeur</h3>
-                                            <p style="margin: 0; color: #1f2937; font-size: 15px; line-height: 1.6;">
-                                                <?php echo nl2br(esc_html($data['feedback'])); ?>
-                                            </p>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <!-- CTA Button -->
-                                    <table width="100%" cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td align="center" style="padding: 20px 0;">
-                                                <a href="<?php echo esc_url($data['assignment_url']); ?>" style="display: inline-block; padding: 16px 40px; background-color: #2D4FB3; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(45, 79, 179, 0.3);">
-                                                    Voir les détails
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </table>
-
-                                    <p style="margin: 30px 0 0 0; font-size: 14px; color: #6b7280; text-align: center;">
-                                        Vous pouvez également consulter votre <a href="<?php echo esc_url($data['dashboard_url']); ?>" style="color: #2D4FB3; text-decoration: none;">tableau de bord</a>
-                                    </p>
-                                </td>
-                            </tr>
-
-                            <!-- Footer -->
-                            <tr>
-                                <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-                                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
-                                        École Internationale des Affaires (EIA)
-                                    </p>
-                                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                        Cet email a été envoyé automatiquement, merci de ne pas y répondre.
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </body>
-        </html>
-        <?php
-        return ob_get_clean();
+        return wp_mail($user->user_email, $subject, $body);
     }
 
     /**
-     * Email template: Assignment submitted
+     * Send daily digest email
      */
-    private function template_assignment_submitted($data) {
-        ob_start();
-        ?>
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Nouvelle soumission</title>
-        </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f7;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f7; padding: 40px 20px;">
-                <tr>
-                    <td align="center">
-                        <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    public function send_daily_digest() {
+        global $wpdb;
 
-                            <!-- Header -->
-                            <tr>
-                                <td style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); padding: 40px 30px; text-align: center;">
-                                    <h1 style="margin: 0; color: white; font-size: 28px; font-weight: 700;"><i class="fas fa-file-alt" style="margin-right: 10px;"></i>Nouveau Devoir Soumis</h1>
-                                    <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">École Internationale des Affaires</p>
-                                </td>
-                            </tr>
+        // Récupérer tous les utilisateurs avec notifications non lues
+        $users_with_notifications = $wpdb->get_col(
+            "SELECT DISTINCT user_id
+            FROM {$wpdb->prefix}eia_notifications
+            WHERE is_read = 0
+            AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)"
+        );
 
-                            <!-- Content -->
-                            <tr>
-                                <td style="padding: 40px 30px;">
-                                    <p style="margin: 0 0 20px 0; font-size: 16px; color: #1f2937;">Bonjour <strong><?php echo esc_html($data['instructor_name']); ?></strong>,</p>
+        foreach ($users_with_notifications as $user_id) {
+            // Vérifier si l'utilisateur veut recevoir le digest
+            $prefs = $wpdb->get_results($wpdb->prepare(
+                "SELECT notification_type FROM {$wpdb->prefix}eia_notification_preferences
+                WHERE user_id = %d AND email_digest = 1",
+                $user_id
+            ));
 
-                                    <p style="margin: 0 0 30px 0; font-size: 16px; color: #1f2937; line-height: 1.6;">
-                                        <strong><?php echo esc_html($data['student_name']); ?></strong> vient de soumettre le devoir <strong>"<?php echo esc_html($data['assignment_title']); ?>"</strong> pour le cours <strong><?php echo esc_html($data['course_title']); ?></strong>.
-                                    </p>
+            if (empty($prefs)) {
+                continue; // Pas de préférences ou digest désactivé
+            }
 
-                                    <!-- Submission Info -->
-                                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 8px; margin-bottom: 30px;">
-                                        <tr>
-                                            <td style="padding: 20px;">
-                                                <table width="100%" cellpadding="8" cellspacing="0">
-                                                    <tr>
-                                                        <td style="color: #6b7280; font-size: 14px; width: 140px;">Date de soumission:</td>
-                                                        <td style="color: #1f2937; font-size: 14px; font-weight: 600;"><?php echo esc_html($data['submitted_date']); ?></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="color: #6b7280; font-size: 14px;">Type de soumission:</td>
-                                                        <td style="color: #1f2937; font-size: 14px;">
-                                                            <?php if ($data['has_file'] && $data['has_text']) : ?>
-                                                                <i class="fas fa-paperclip"></i> Fichier + <i class="fas fa-align-left"></i> Texte
-                                                            <?php elseif ($data['has_file']) : ?>
-                                                                <i class="fas fa-paperclip"></i> Fichier uniquement
-                                                            <?php else : ?>
-                                                                <i class="fas fa-align-left"></i> Texte uniquement
-                                                            <?php endif; ?>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
+            // Récupérer les notifications non lues des dernières 24h
+            $notifications = $this->get_notifications($user_id, 50, 0, true);
 
-                                    <!-- CTA Button -->
-                                    <table width="100%" cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td align="center" style="padding: 20px 0;">
-                                                <a href="<?php echo esc_url($data['grading_url']); ?>" style="display: inline-block; padding: 16px 40px; background-color: #F59E0B; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
-                                                    Noter le devoir
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </table>
+            if (empty($notifications)) {
+                continue;
+            }
 
-                                    <p style="margin: 30px 0 0 0; font-size: 14px; color: #6b7280; text-align: center;">
-                                        Pensez à noter rapidement pour maintenir l'engagement de vos étudiants!
-                                    </p>
-                                </td>
-                            </tr>
+            $this->send_digest_email($user_id, $notifications);
+        }
+    }
 
-                            <!-- Footer -->
-                            <tr>
-                                <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-                                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">
-                                        École Internationale des Affaires (EIA)
-                                    </p>
-                                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                        Cet email a été envoyé automatiquement, merci de ne pas y répondre.
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </body>
-        </html>
-        <?php
-        return ob_get_clean();
+    /**
+     * Send digest email to user
+     */
+    private function send_digest_email($user_id, $notifications) {
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return false;
+        }
+
+        $count = count($notifications);
+        $subject = "[EIA] Vous avez {$count} notification" . ($count > 1 ? 's' : '') . " non lue" . ($count > 1 ? 's' : '');
+
+        $body = "Bonjour {$user->display_name},\n\n";
+        $body .= "Voici un résumé de vos notifications des dernières 24 heures:\n\n";
+
+        foreach ($notifications as $notif) {
+            $body .= "• " . $notif->title . "\n";
+            $body .= "  " . strip_tags($notif->message) . "\n";
+            if ($notif->action_url) {
+                $body .= "  → " . $notif->action_url . "\n";
+            }
+            $body .= "\n";
+        }
+
+        $body .= "---\n";
+        $body .= "Connectez-vous pour voir toutes vos notifications: " . site_url('/mes-cours/') . "\n\n";
+        $body .= "École Internationale des Affaires\n";
+        $body .= site_url();
+
+        return wp_mail($user->user_email, $subject, $body);
+    }
+
+    // ==================== NOTIFICATION TRIGGERS ====================
+
+    /**
+     * Notify: Assignment submitted
+     */
+    public function notify_assignment_submitted($assignment_id, $user_id, $submission_id) {
+        $assignment = get_post($assignment_id);
+        $student = get_userdata($user_id);
+        $instructor_id = $assignment->post_author;
+
+        $this->create_notification(
+            $instructor_id,
+            'assignment_submitted',
+            'Nouveau devoir soumis',
+            "<strong>{$student->display_name}</strong> a soumis le devoir <strong>{$assignment->post_title}</strong>.",
+            admin_url("post.php?post={$assignment_id}&action=edit"),
+            'file-alt'
+        );
+    }
+
+    /**
+     * Notify: Assignment graded
+     */
+    public function notify_assignment_graded($assignment_id, $user_id, $grade) {
+        $assignment = get_post($assignment_id);
+
+        $this->create_notification(
+            $user_id,
+            'assignment_graded',
+            'Devoir noté',
+            "Votre devoir <strong>{$assignment->post_title}</strong> a été noté: <strong>{$grade}/100</strong>",
+            get_permalink($assignment_id),
+            'check-circle'
+        );
+    }
+
+    /**
+     * Notify: Forum reply
+     */
+    public function notify_forum_reply($topic_id, $reply_id, $author_id) {
+        global $wpdb;
+
+        $topic = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}eia_forum_topics WHERE id = %d",
+            $topic_id
+        ));
+
+        if (!$topic || $topic->user_id == $author_id) {
+            return; // Ne pas notifier l'auteur de sa propre réponse
+        }
+
+        $author = get_userdata($author_id);
+
+        $this->create_notification(
+            $topic->user_id,
+            'forum_reply',
+            'Nouvelle réponse à votre question',
+            "<strong>{$author->display_name}</strong> a répondu à votre question: <strong>{$topic->title}</strong>",
+            site_url("/forum-cours/?course_id={$topic->course_id}&topic_id={$topic_id}"),
+            'comments'
+        );
+    }
+
+    /**
+     * Notify: Best answer marked
+     */
+    public function notify_best_answer($topic_id, $reply_id, $author_id) {
+        $author = get_userdata($author_id);
+
+        $this->create_notification(
+            $author_id,
+            'forum_best_answer',
+            'Meilleure réponse sélectionnée! 🎉',
+            "Votre réponse a été marquée comme la meilleure! Vous avez gagné <strong>+15 XP</strong>",
+            site_url("/forum-cours/?topic_id={$topic_id}"),
+            'star'
+        );
+    }
+
+    /**
+     * Notify: New course published
+     */
+    public function notify_new_course($post_id, $post) {
+        if ($post->post_status !== 'publish' || wp_is_post_revision($post_id)) {
+            return;
+        }
+
+        // Notifier tous les étudiants
+        $students = get_users(array('role' => 'student'));
+
+        foreach ($students as $student) {
+            $this->create_notification(
+                $student->ID,
+                'new_course',
+                'Nouveau cours disponible!',
+                "Un nouveau cours est maintenant disponible: <strong>{$post->post_title}</strong>",
+                get_permalink($post_id),
+                'graduation-cap'
+            );
+        }
+    }
+
+    /**
+     * Notify: Certificate earned
+     */
+    public function notify_certificate($user_id, $course_id) {
+        $course = get_post($course_id);
+
+        $this->create_notification(
+            $user_id,
+            'certificate_earned',
+            'Certificat obtenu! 🎓',
+            "Félicitations! Vous avez obtenu votre certificat pour le cours <strong>{$course->post_title}</strong>",
+            site_url("/certificat/?course_id={$course_id}"),
+            'certificate'
+        );
+    }
+
+    /**
+     * Notify: XP earned
+     */
+    public function notify_xp_earned($user_id, $xp_amount, $reason) {
+        $this->create_notification(
+            $user_id,
+            'xp_earned',
+            "Points d'expérience gagnés!",
+            "Vous avez gagné <strong>+{$xp_amount} XP</strong> pour: {$reason}",
+            site_url('/mes-cours/'),
+            'trophy'
+        );
+    }
+
+    /**
+     * Notify: Badge earned
+     */
+    public function notify_badge_earned($user_id, $badge_name) {
+        $this->create_notification(
+            $user_id,
+            'badge_earned',
+            'Nouveau badge débloqué! 🏆',
+            "Félicitations! Vous avez débloqué le badge <strong>{$badge_name}</strong>",
+            site_url('/mes-cours/'),
+            'medal'
+        );
+    }
+
+    /**
+     * Notify: Assignment reminder (24h before due)
+     */
+    public function notify_assignment_reminder($assignment_id, $user_id) {
+        $assignment = get_post($assignment_id);
+        $due_date = get_post_meta($assignment_id, '_assignment_due_date', true);
+
+        $this->create_notification(
+            $user_id,
+            'assignment_reminder',
+            'Rappel: Devoir à rendre bientôt',
+            "Le devoir <strong>{$assignment->post_title}</strong> est à rendre le <strong>" . date('d/m/Y à H:i', strtotime($due_date)) . "</strong>",
+            get_permalink($assignment_id),
+            'clock'
+        );
     }
 }
