@@ -92,6 +92,7 @@ class EIA_LMS_Core {
         require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-notifications.php';
         require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-gamification.php';
         require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-certificates.php';
+        require_once EIA_LMS_CORE_PLUGIN_DIR . 'includes/class-forum.php';
     }
 
     /**
