@@ -299,15 +299,21 @@ class EIA_Messaging {
         if (!empty($threads['threads'])) {
             foreach ($threads['threads'] as $thread) {
                 $last_message = BP_Messages_Thread::get_last_message($thread->thread_id);
+
+                // Skip if no last message
+                if (!$last_message) {
+                    continue;
+                }
+
                 $other_user_id = $this->get_other_user_id($thread->thread_id, $user_id);
                 $other_user = get_userdata($other_user_id);
 
                 $conversations[] = array(
                     'thread_id' => $thread->thread_id,
-                    'subject' => $thread->subject,
-                    'excerpt' => wp_trim_words(strip_tags($last_message->message), 10),
-                    'date' => bp_core_time_since($last_message->date_sent),
-                    'unread' => $thread->unread_count,
+                    'subject' => isset($thread->subject) ? $thread->subject : 'Conversation',
+                    'excerpt' => wp_trim_words(strip_tags($last_message->message ?? ''), 10),
+                    'date' => bp_core_time_since($last_message->date_sent ?? time()),
+                    'unread' => isset($thread->unread_count) ? $thread->unread_count : 0,
                     'recipient' => array(
                         'id' => $other_user_id,
                         'name' => $other_user ? $other_user->display_name : 'Utilisateur',
@@ -379,10 +385,12 @@ class EIA_Messaging {
      */
     private function get_other_user_id($thread_id, $current_user_id) {
         global $wpdb;
-        $bp = buddypress();
+
+        // Use direct table name to avoid BP object issues
+        $table = $wpdb->prefix . 'bp_messages_recipients';
 
         $recipient_id = $wpdb->get_var($wpdb->prepare(
-            "SELECT user_id FROM {$bp->messages->table_name_recipients}
+            "SELECT user_id FROM {$table}
             WHERE thread_id = %d AND user_id != %d
             LIMIT 1",
             $thread_id, $current_user_id

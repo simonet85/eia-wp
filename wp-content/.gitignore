@@ -10,6 +10,13 @@ wp-content/uploads/
 !wp-content/themes/**/*
 !wp-content/plugins/**/*
 
+# Windows reserved files
+nul
+con
+prn
+aux
+
+
 # Ignore vendor, node, logs, system
 vendor/
 node_modules/

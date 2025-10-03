@@ -3,7 +3,18 @@
     "allow": [
       "Bash(mkdir:*)",
       "Bash(cp:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(wp plugin list:*)",
+      "Bash(php:*)",
+      "Bash(wp post list:*)",
+      "Bash(wp cache:*)",
+      "Bash(if exist:*)",
+      "Bash(grep:*)",
+      "Bash(composer install:*)",
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(composer:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
