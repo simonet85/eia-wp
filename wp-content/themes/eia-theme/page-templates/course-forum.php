@@ -306,37 +306,53 @@ body.admin-bar { margin-top: 32px !important; }
 </div>
 
 <!-- New Topic Modal -->
-<div id="new-topic-modal" class="forum-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
-    <div class="forum-form" style="max-width: 600px; margin: 2rem; position: relative;">
-        <h3><i class="fas fa-plus-circle"></i> Nouvelle question</h3>
+<div id="new-topic-modal" class="forum-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000;">
+    <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 2rem;">
+        <div class="forum-form" style="max-width: 600px; width: 100%; position: relative;">
+            <h3><i class="fas fa-plus-circle"></i> Nouvelle question</h3>
 
-        <form id="new-topic-form">
-            <input type="hidden" id="topic-course-id" value="<?php echo $course_id; ?>">
+            <form id="new-topic-form">
+                <input type="hidden" id="topic-course-id" value="<?php echo $course_id; ?>">
 
-            <div class="form-group">
-                <label for="topic-title">Titre de la question *</label>
-                <input type="text" id="topic-title" name="title" required placeholder="Ex: Comment installer WordPress sur Laragon?">
-            </div>
+                <div class="form-group">
+                    <label for="topic-title">Titre de la question *</label>
+                    <input type="text" id="topic-title" name="title" required placeholder="Ex: Comment installer WordPress sur Laragon?">
+                </div>
 
-            <div class="form-group">
-                <label for="topic-content">Détails *</label>
-                <textarea id="topic-content" name="content" required placeholder="Décrivez votre question en détail..."></textarea>
-            </div>
+                <div class="form-group">
+                    <label for="topic-content">Détails *</label>
+                    <textarea id="topic-content" name="content" required placeholder="Décrivez votre question en détail..."></textarea>
+                </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-paper-plane"></i> Publier
-                </button>
-                <button type="button" class="btn-cancel">Annuler</button>
-            </div>
-        </form>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Publier
+                    </button>
+                    <button type="button" class="btn-cancel">Annuler</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<style>
-.forum-modal {
-    display: flex !important;
-}
-</style>
+<script>
+// Ensure modal closes properly
+jQuery(document).ready(function($) {
+    // Close on cancel button
+    $(document).on('click', '.btn-cancel', function(e) {
+        e.preventDefault();
+        $('#new-topic-modal').fadeOut(200);
+        $('#new-topic-form')[0].reset();
+    });
+
+    // Close on background click
+    $('#new-topic-modal').on('click', function(e) {
+        if (e.target === this) {
+            $(this).fadeOut(200);
+            $('#new-topic-form')[0].reset();
+        }
+    });
+});
+</script>
 
 <?php get_footer(); ?>
