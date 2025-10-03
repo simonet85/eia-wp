@@ -164,8 +164,8 @@ class EIA_Calendar {
         $assignments = $wpdb->get_results($wpdb->prepare(
             "SELECT p.ID, p.post_title, pm.meta_value as due_date, pm2.meta_value as course_id
             FROM {$wpdb->posts} p
-            INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_eia_assignment_due_date'
-            INNER JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = '_eia_assignment_course'
+            INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_assignment_due_date'
+            INNER JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = '_assignment_course_id'
             WHERE p.post_type = 'lp_assignment'
             AND p.post_status = 'publish'
             AND pm2.meta_value IN ($placeholders)",
