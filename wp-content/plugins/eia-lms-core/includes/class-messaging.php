@@ -298,7 +298,15 @@ class EIA_Messaging {
         $conversations = array();
         if (!empty($threads['threads'])) {
             foreach ($threads['threads'] as $thread) {
-                $last_message = BP_Messages_Thread::get_last_message($thread->thread_id);
+                // Get last message using thread object
+                $thread_obj = new BP_Messages_Thread($thread->thread_id);
+
+                if (empty($thread_obj->messages)) {
+                    continue;
+                }
+
+                // Get last message from messages array
+                $last_message = end($thread_obj->messages);
 
                 // Skip if no last message
                 if (!$last_message) {
