@@ -1,0 +1,104 @@
+/**
+ * EIA Assignments CSS
+ *
+ * @package EIA_LMS_Core
+ */
+
+/* Loading spinner animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.dashicons-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .assignments-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .assignment-card {
+        padding: 1rem !important;
+    }
+
+    .assignment-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+    }
+
+    .assignment-meta {
+        flex-direction: column;
+        gap: 0.75rem !important;
+    }
+
+    .submission-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .submission-details {
+        flex-direction: column;
+        gap: 0.75rem !important;
+    }
+
+    .grade-field {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+}
+
+/* Print styles for submissions */
+@media print {
+    .grading-form,
+    .form-actions,
+    .save-grade-btn {
+        display: none !important;
+    }
+
+    .submission-card {
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+    }
+}
+
+/* Accessibility improvements */
+.button:focus,
+input:focus,
+textarea:focus {
+    outline: 2px solid #2D4FB3;
+    outline-offset: 2px;
+}
+
+/* Smooth transitions */
+.assignment-card,
+.submission-card,
+.button,
+.status-badge {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Empty state improvements */
+.no-assignments,
+.no-submissions {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

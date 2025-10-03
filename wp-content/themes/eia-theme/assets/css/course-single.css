@@ -1,0 +1,297 @@
+/**
+ * Single Course Styles
+ * Design inspired by modern learning platforms
+ */
+
+/* Course Video Player */
+.eia-course-single .aspect-video {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+}
+
+.eia-course-single .aspect-video > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Tab Transitions */
+.course-tab {
+    transition: all 0.2s ease;
+}
+
+.tab-content {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Section Toggle Animation */
+.section-items {
+    transition: all 0.3s ease;
+}
+
+.section-toggle:hover {
+    background-color: #f9fafb;
+}
+
+/* Checkbox Styles */
+input[type="checkbox"]:checked {
+    background-color: #2D4FB3;
+    border-color: #2D4FB3;
+}
+
+/* Course Card Hover Effects */
+.eia-course-single a {
+    transition: all 0.2s ease;
+}
+
+/* Rating Stars */
+.rating-star {
+    transition: transform 0.2s ease;
+}
+
+.rating-star:hover {
+    transform: scale(1.2);
+}
+
+/* Progress Bar */
+.progress-bar {
+    height: 8px;
+    background: linear-gradient(90deg, #2D4FB3 0%, #F59E0B 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Sticky Sidebar */
+.sticky {
+    position: sticky;
+    top: 1rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .sticky {
+        position: relative;
+    }
+}
+
+/* Video Controls Hover */
+.eia-course-single button:hover svg {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* Comment Box Focus */
+textarea:focus {
+    outline: none;
+    border-color: #2D4FB3;
+    box-shadow: 0 0 0 3px rgba(45, 79, 179, 0.1);
+}
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, #2D4FB3 0%, #1e3a8a 100%);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(45, 79, 179, 0.2);
+}
+
+.btn-secondary {
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #f3f4f6;
+}
+
+/* Course Features Grid */
+.course-features {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Announcement Card */
+.announcement-card {
+    border-left: 4px solid #2D4FB3;
+    padding-left: 1rem;
+}
+
+/* Review Rating */
+.review-rating {
+    display: flex;
+    gap: 0.25rem;
+}
+
+/* Scrollbar Styling */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Tooltip */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    background: #1f2937;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    z-index: 50;
+    margin-bottom: 0.5rem;
+}
+
+/* Badge Styles */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-warning {
+    background-color: #fed7aa;
+    color: #92400e;
+}
+
+.badge-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Content Preview Fade */
+.content-preview {
+    position: relative;
+    max-height: 300px;
+    overflow: hidden;
+}
+
+.content-preview::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, white);
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+    .eia-course-single {
+        /* Add dark mode styles here if needed */
+    }
+}
+
+/* Print Styles */
+@media print {
+    .course-tab,
+    .sidebar,
+    .video-player,
+    button {
+        display: none !important;
+    }
+}
+
+/* Accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus Styles for Accessibility */
+a:focus,
+button:focus,
+input:focus,
+textarea:focus {
+    outline: 2px solid #2D4FB3;
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .btn-primary,
+    .btn-secondary {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

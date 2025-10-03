@@ -1,0 +1,62 @@
+# WordPress core
+/wp-admin/
+/wp-includes/
+/wp-*.php
+!/wp-content/
+
+# Configuration
+wp-config.php
+.htaccess
+
+# Uploads and cache
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/backups/
+
+# Plugins (track only custom)
+wp-content/plugins/*
+!wp-content/plugins/eia-lms-core/
+
+# Themes (track only custom)
+wp-content/themes/*
+!wp-content/themes/eia-theme/
+
+# Temporary and log files
+*.log
+error_log
+debug.log
+.DS_Store
+Thumbs.db
+NUL
+
+# Diagnostic scripts (optional - exclude test utilities)
+check-*.php
+debug-*.php
+verify-*.php
+test-*.php
+enroll-*.php
+create-*.php
+flush-*.php
+fix-*.php
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node modules (if using build tools)
+node_modules/
+package-lock.json
+
+# Composer
+vendor/
+composer.lock

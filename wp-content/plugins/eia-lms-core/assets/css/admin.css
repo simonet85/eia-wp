@@ -1,0 +1,482 @@
+/**
+ * EIA LMS Core - Admin Styles
+ *
+ * @package EIA_LMS_Core
+ */
+
+/* ===========================
+   Color Variables
+   =========================== */
+:root {
+    --eia-blue: #2D4FB3;
+    --eia-orange: #F59E0B;
+    --eia-purple: #8B5CF6;
+    --eia-green: #10B981;
+    --eia-red: #EF4444;
+    --eia-gray-50: #F9FAFB;
+    --eia-gray-100: #F3F4F6;
+    --eia-gray-200: #E5E7EB;
+    --eia-gray-300: #D1D5DB;
+    --eia-gray-600: #4B5563;
+    --eia-gray-800: #1F2937;
+}
+
+/* ===========================
+   Course Builder Styles
+   =========================== */
+.eia-course-builder {
+    background: var(--eia-gray-50);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.course-builder-header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--eia-gray-200);
+}
+
+.builder-tabs {
+    display: flex;
+    gap: 5px;
+}
+
+.builder-tab {
+    padding: 12px 24px;
+    background: #fff;
+    border: 1px solid var(--eia-gray-300);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.builder-tab:hover:not(.active) {
+    background: var(--eia-gray-100);
+}
+
+.builder-tab.active {
+    background: var(--eia-blue);
+    color: #fff;
+}
+
+.builder-tab .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.builder-tab-content {
+    display: none;
+    background: #fff;
+    padding: 20px;
+    border-radius: 0 8px 8px 8px;
+}
+
+.builder-tab-content.active {
+    display: block;
+}
+
+.builder-layout {
+    display: flex;
+    gap: 20px;
+}
+
+.builder-sidebar {
+    width: 320px;
+    background: #fff;
+    border: 1px solid var(--eia-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.builder-sidebar h3 {
+    margin-top: 0;
+    color: var(--eia-gray-800);
+    font-size: 16px;
+}
+
+.builder-main {
+    flex: 1;
+    background: #fff;
+    border: 1px solid var(--eia-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.curriculum-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.curriculum-header h3 {
+    margin: 0;
+    color: var(--eia-gray-800);
+    font-size: 18px;
+}
+
+/* Available Items */
+.item-type-group {
+    margin-bottom: 25px;
+}
+
+.item-type-group h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--eia-gray-800);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.item-search {
+    margin-bottom: 10px;
+}
+
+.item-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--eia-gray-300);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.available-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: var(--eia-gray-50);
+    border: 1px solid var(--eia-gray-200);
+    border-radius: 6px;
+    cursor: move;
+    transition: all 0.2s;
+}
+
+.available-item:hover {
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.item-icon {
+    color: var(--eia-blue);
+}
+
+.item-title {
+    flex: 1;
+    font-size: 14px;
+    color: var(--eia-gray-800);
+}
+
+.add-item-btn {
+    background: var(--eia-blue);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.add-item-btn:hover {
+    background: #1e3a8a;
+}
+
+/* Course Sections */
+.course-sections {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.course-section {
+    background: #fff;
+    border: 1px solid var(--eia-gray-200);
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: var(--eia-gray-50);
+    border-bottom: 1px solid var(--eia-gray-200);
+    border-radius: 8px 8px 0 0;
+}
+
+.section-handle {
+    cursor: move;
+    color: var(--eia-gray-600);
+}
+
+.section-title {
+    flex: 1;
+    font-weight: 600;
+    color: var(--eia-gray-800);
+}
+
+.section-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.section-actions button {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--eia-gray-600);
+    transition: color 0.2s;
+}
+
+.section-actions button:hover {
+    color: var(--eia-blue);
+}
+
+.delete-section-btn:hover {
+    color: var(--eia-red) !important;
+}
+
+/* Section Items */
+.section-items {
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+    min-height: 60px;
+}
+
+.section-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: var(--eia-gray-50);
+    border: 1px solid var(--eia-gray-200);
+    border-radius: 6px;
+    cursor: move;
+}
+
+.item-handle {
+    cursor: move;
+    color: var(--eia-gray-600);
+}
+
+.remove-item-btn {
+    background: transparent;
+    border: none;
+    color: var(--eia-red);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.remove-item-btn:hover {
+    color: #dc2626;
+}
+
+/* Placeholders */
+.section-placeholder,
+.item-placeholder {
+    background: var(--eia-blue);
+    opacity: 0.2;
+    border: 2px dashed var(--eia-blue);
+    border-radius: 6px;
+    height: 50px;
+    margin-bottom: 8px;
+}
+
+/* ===========================
+   Gradebook Styles
+   =========================== */
+.eia-gradebook-wrapper {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.gradebook-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--eia-gray-50);
+    border-radius: 8px;
+}
+
+.gradebook-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.gradebook-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.gradebook-table th {
+    background: var(--eia-blue);
+    color: #fff;
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.gradebook-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--eia-gray-200);
+    vertical-align: middle;
+}
+
+.gradebook-table tr:hover {
+    background: var(--eia-gray-50);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 24px;
+    background: var(--eia-gray-200);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--eia-blue);
+    transition: width 0.3s;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--eia-gray-800);
+}
+
+.grade-value {
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--eia-gray-800);
+}
+
+.manual-grade-input {
+    width: 80px;
+    padding: 6px 10px;
+    border: 1px solid var(--eia-gray-300);
+    border-radius: 4px;
+    text-align: center;
+}
+
+.final-grade {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-completed {
+    background: var(--eia-green);
+    color: #fff;
+}
+
+.status-in-progress {
+    background: var(--eia-orange);
+    color: #fff;
+}
+
+.status-failed {
+    background: var(--eia-red);
+    color: #fff;
+}
+
+.status-pending {
+    background: var(--eia-gray-300);
+    color: var(--eia-gray-800);
+}
+
+/* ===========================
+   Quiz Extended Styles
+   =========================== */
+.eia-quiz-extended-options {
+    padding: 15px;
+}
+
+.eia-quiz-extended-options p {
+    margin-bottom: 12px;
+}
+
+.eia-quiz-extended-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.eia-quiz-extended-options input[type="number"] {
+    width: 100%;
+    margin-top: 5px;
+    padding: 6px 10px;
+    border: 1px solid var(--eia-gray-300);
+    border-radius: 4px;
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+@media (max-width: 1200px) {
+    .builder-layout {
+        flex-direction: column;
+    }
+
+    .builder-sidebar {
+        width: 100%;
+        max-height: 400px;
+    }
+
+    .eia-chart-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .builder-tabs {
+        flex-wrap: wrap;
+    }
+
+    .gradebook-table {
+        font-size: 12px;
+    }
+
+    .gradebook-table th,
+    .gradebook-table td {
+        padding: 8px 4px;
+    }
+
+    .eia-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
