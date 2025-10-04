@@ -95,8 +95,9 @@
             });
         },
 
-        loadConversations: function() {
+        loadConversations: function(silent) {
             const self = this;
+            silent = silent || false;
 
             $.ajax({
                 url: eiaMessaging.ajaxurl,
@@ -106,7 +107,10 @@
                     nonce: eiaMessaging.nonce
                 },
                 beforeSend: function() {
-                    $('#eia-conversations-list').html('<div class="eia-loading"><i class="fas fa-circle-notch fa-spin"></i> Chargement...</div>');
+                    // Only show loading on initial load, not on refresh
+                    if (!silent) {
+                        $('#eia-conversations-list').html('<div class="eia-loading"><i class="fas fa-circle-notch fa-spin"></i> Chargement...</div>');
+                    }
                 },
                 success: function(response) {
                     if (response.success) {
@@ -114,7 +118,9 @@
                     }
                 },
                 error: function() {
-                    $('#eia-conversations-list').html('<div class="eia-loading">Erreur de chargement</div>');
+                    if (!silent) {
+                        $('#eia-conversations-list').html('<div class="eia-loading">Erreur de chargement</div>');
+                    }
                 }
             });
         },
@@ -433,7 +439,8 @@
                     // Silent refresh - no loading indicator
                     self.loadMessages(self.currentThreadId, true);
                 }
-                self.loadConversations();
+                // Silent refresh for conversations too
+                self.loadConversations(true);
             }, 10000);
         },
 
