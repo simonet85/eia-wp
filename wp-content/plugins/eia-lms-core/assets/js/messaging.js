@@ -23,18 +23,18 @@
             // New message button
             $(document).on('click', '#eia-new-message-btn', function(e) {
                 e.preventDefault();
-                $('#eia-new-message-modal').addClass('active');
+                self.openModal('#eia-new-message-modal');
             });
 
             // Close modal
             $(document).on('click', '.eia-modal-close', function() {
-                $(this).closest('.eia-modal').removeClass('active');
+                self.closeModal($(this).closest('.eia-modal'));
             });
 
             // Close modal on background click
             $('.eia-modal').on('click', function(e) {
                 if (e.target === this) {
-                    $(this).removeClass('active');
+                    self.closeModal($(this));
                 }
             });
 
@@ -121,6 +121,7 @@
 
         renderConversations: function(conversations) {
             const list = $('#eia-conversations-list');
+            const activeThreadId = this.currentThreadId;
 
             if (!conversations || conversations.length === 0) {
                 list.html('<div class="eia-loading">Aucune conversation</div>');
@@ -131,9 +132,10 @@
             conversations.forEach(function(conv) {
                 const unreadBadge = conv.unread > 0 ?
                     `<span class="eia-conversation-unread">${conv.unread}</span>` : '';
+                const activeClass = activeThreadId == conv.thread_id ? 'active' : '';
 
                 html += `
-                    <div class="eia-conversation-item" data-thread-id="${conv.thread_id}">
+                    <div class="eia-conversation-item ${activeClass}" data-thread-id="${conv.thread_id}">
                         <div class="eia-conversation-avatar">
                             <img src="${conv.recipient.avatar}" alt="${conv.recipient.name}">
                         </div>
@@ -195,6 +197,11 @@
 
             // Render messages
             const list = $('#eia-messages-list');
+            const currentScroll = list.scrollTop();
+            const scrollHeight = list[0].scrollHeight;
+            const containerHeight = list.height();
+            const isScrolledToBottom = currentScroll + containerHeight >= scrollHeight - 50;
+
             let html = '';
 
             messages.forEach(function(msg) {
@@ -217,8 +224,10 @@
 
             list.html(html);
 
-            // Scroll to bottom
-            list.scrollTop(list[0].scrollHeight);
+            // Only auto-scroll if user was already at bottom
+            if (isScrolledToBottom) {
+                list.scrollTop(list[0].scrollHeight);
+            }
         },
 
         sendMessage: function() {
@@ -305,16 +314,22 @@
                 success: function(response) {
                     console.log('sendNewMessage response:', response);
                     if (response.success) {
-                        $('#eia-new-message-modal').removeClass('active');
-                        $('#eia-recipient-select').val('');
-                        $('#eia-new-message-text').val('');
+                        // Close modal with animation
+                        self.closeModal($('#eia-new-message-modal'));
+
+                        // Clear form
+                        setTimeout(function() {
+                            $('#eia-recipient-select').val('');
+                            $('#eia-new-message-text').val('');
+                        }, 200);
+
                         self.loadConversations();
 
                         // Load the new thread
                         if (response.data.thread_id) {
                             setTimeout(function() {
                                 self.loadMessages(response.data.thread_id);
-                            }, 500);
+                            }, 300);
                         }
                     } else {
                         alert(response.data.message || 'Erreur lors de l\'envoi');
@@ -397,6 +412,17 @@
                 }
                 self.loadConversations();
             }, 10000);
+        },
+
+        openModal: function(modalSelector) {
+            $(modalSelector).addClass('active');
+        },
+
+        closeModal: function($modal) {
+            $modal.addClass('closing');
+            setTimeout(function() {
+                $modal.removeClass('active closing');
+            }, 200);
         }
     };
 

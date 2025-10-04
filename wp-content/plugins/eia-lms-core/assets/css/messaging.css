@@ -212,12 +212,25 @@
     overflow-y: auto;
     padding: 20px;
     background: #f9fafb;
+    scroll-behavior: smooth;
 }
 
 .eia-message-item {
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
+    animation: fadeInMessage 0.2s ease-in;
+}
+
+@keyframes fadeInMessage {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .eia-message-item.own {
@@ -372,10 +385,17 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
 
 .eia-modal.active {
     display: flex;
+    opacity: 1;
+}
+
+.eia-modal.closing {
+    opacity: 0;
 }
 
 .eia-modal-content {
@@ -386,6 +406,12 @@
     max-height: 90vh;
     overflow: auto;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    transform: scale(0.9);
+    transition: transform 0.2s ease-in-out;
+}
+
+.eia-modal.active .eia-modal-content {
+    transform: scale(1);
 }
 
 .eia-modal-header {
