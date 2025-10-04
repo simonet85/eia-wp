@@ -410,6 +410,15 @@
     padding: 0;
     width: 32px;
     height: 32px;
+    line-height: 32px;
+}
+
+/* Button "Annuler" in modal footer */
+.eia-modal-footer .eia-modal-close {
+    width: auto;
+    height: auto;
+    font-size: 14px;
+    line-height: normal;
 }
 
 .eia-modal-body {

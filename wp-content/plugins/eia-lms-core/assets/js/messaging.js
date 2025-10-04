@@ -277,6 +277,9 @@
             const recipientId = $('#eia-recipient-select').val();
             const message = $('#eia-new-message-text').val().trim();
 
+            console.log('sendNewMessage - recipientId:', recipientId);
+            console.log('sendNewMessage - message:', message);
+
             if (!recipientId) {
                 alert('Sélectionnez un destinataire');
                 return;
@@ -300,6 +303,7 @@
                     $('#eia-send-new-message-btn').prop('disabled', true);
                 },
                 success: function(response) {
+                    console.log('sendNewMessage response:', response);
                     if (response.success) {
                         $('#eia-new-message-modal').removeClass('active');
                         $('#eia-recipient-select').val('');
@@ -313,8 +317,12 @@
                             }, 500);
                         }
                     } else {
-                        alert(response.data.message);
+                        alert(response.data.message || 'Erreur lors de l\'envoi');
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error('sendNewMessage error:', xhr, status, error);
+                    alert('Erreur lors de l\'envoi: ' + error);
                 },
                 complete: function() {
                     $('#eia-send-new-message-btn').prop('disabled', false);
