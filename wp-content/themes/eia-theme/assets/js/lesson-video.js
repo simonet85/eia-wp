@@ -109,7 +109,7 @@
                 url: eiaLesson.ajaxurl,
                 type: 'POST',
                 data: {
-                    action: 'eia_update_lesson_progress',
+                    action: 'eia_update_lesson_video_progress',
                     nonce: eiaLesson.nonce,
                     lesson_id: this.lessonId,
                     course_id: this.courseId,
@@ -132,7 +132,7 @@
                 url: eiaLesson.ajaxurl,
                 type: 'POST',
                 data: {
-                    action: 'eia_complete_lesson',
+                    action: 'eia_complete_lesson_video',
                     nonce: eiaLesson.nonce,
                     lesson_id: this.lessonId,
                     course_id: this.courseId

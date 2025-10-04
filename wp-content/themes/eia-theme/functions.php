@@ -1670,7 +1670,10 @@ add_action('admin_head', 'eia_admin_bar_notifications_css');
  */
 
 // Include lesson video functions
-require_once get_template_directory() . '/inc/lesson-video-functions.php';
+$lesson_video_functions = get_template_directory() . '/inc/lesson-video-functions.php';
+if (file_exists($lesson_video_functions)) {
+    require_once $lesson_video_functions;
+}
 
 /**
  * Enqueue lesson video assets

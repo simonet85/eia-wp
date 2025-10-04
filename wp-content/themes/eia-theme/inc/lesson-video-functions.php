@@ -290,9 +290,9 @@ function eia_lesson_reviews_shortcode($atts) {
 add_shortcode('eia_lesson_reviews', 'eia_lesson_reviews_shortcode');
 
 /**
- * AJAX: Update Lesson Progress
+ * AJAX: Update Lesson Progress (Video Player)
  */
-function eia_ajax_update_lesson_progress() {
+function eia_ajax_update_lesson_video_progress() {
     check_ajax_referer('eia-lesson-nonce', 'nonce');
 
     $lesson_id = isset($_POST['lesson_id']) ? intval($_POST['lesson_id']) : 0;
@@ -314,12 +314,12 @@ function eia_ajax_update_lesson_progress() {
         'total_watched' => $current_progress + $watched_duration
     ));
 }
-add_action('wp_ajax_eia_update_lesson_progress', 'eia_ajax_update_lesson_progress');
+add_action('wp_ajax_eia_update_lesson_video_progress', 'eia_ajax_update_lesson_video_progress');
 
 /**
- * AJAX: Complete Lesson
+ * AJAX: Complete Lesson (Video Player)
  */
-function eia_ajax_complete_lesson() {
+function eia_ajax_complete_lesson_video() {
     check_ajax_referer('eia-lesson-nonce', 'nonce');
 
     $lesson_id = isset($_POST['lesson_id']) ? intval($_POST['lesson_id']) : 0;
@@ -346,7 +346,7 @@ function eia_ajax_complete_lesson() {
         'course_progress' => round($progress)
     ));
 }
-add_action('wp_ajax_eia_complete_lesson', 'eia_ajax_complete_lesson');
+add_action('wp_ajax_eia_complete_lesson_video', 'eia_ajax_complete_lesson_video');
 
 /**
  * AJAX: Save Lesson Note
