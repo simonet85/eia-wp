@@ -69,14 +69,14 @@ class EIA_Messaging {
             'eia-messaging',
             EIA_LMS_CORE_PLUGIN_URL . 'assets/css/messaging.css',
             array(),
-            '1.0.0'
+            '1.0.2'
         );
 
         wp_enqueue_script(
             'eia-messaging',
             EIA_LMS_CORE_PLUGIN_URL . 'assets/js/messaging.js',
             array('jquery'),
-            '1.0.0',
+            '1.0.2',
             true
         );
 
