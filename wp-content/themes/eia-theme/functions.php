@@ -1662,4 +1662,71 @@ function eia_admin_bar_notifications_css() {
 }
 add_action('wp_head', 'eia_admin_bar_notifications_css');
 add_action('admin_head', 'eia_admin_bar_notifications_css');
+
+/**
+ * =====================================================
+ * LESSON VIDEO PLAYER
+ * =====================================================
+ */
+
+// Include lesson video functions
+require_once get_template_directory() . '/inc/lesson-video-functions.php';
+
+/**
+ * Enqueue lesson video assets
+ */
+function eia_enqueue_lesson_video_assets() {
+    // Only on lesson pages
+    if (!is_singular('lp_lesson')) {
+        return;
+    }
+
+    // CSS
+    wp_enqueue_style(
+        'eia-lesson-video',
+        get_template_directory_uri() . '/assets/css/lesson-video.css',
+        array(),
+        '1.0.0'
+    );
+
+    // JavaScript
+    wp_enqueue_script(
+        'eia-lesson-video',
+        get_template_directory_uri() . '/assets/js/lesson-video.js',
+        array('jquery'),
+        '1.0.0',
+        true
+    );
+
+    // Localize script
+    wp_localize_script('eia-lesson-video', 'eiaLesson', array(
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('eia-lesson-nonce'),
+        'lessonId' => get_the_ID(),
+        'courseId' => get_post_meta(get_the_ID(), '_lp_course', true)
+    ));
+}
+add_action('wp_enqueue_scripts', 'eia_enqueue_lesson_video_assets');
+
+/**
+ * Add lesson-id and course-id data attributes to wrapper
+ */
+function eia_add_lesson_data_attributes() {
+    if (!is_singular('lp_lesson')) {
+        return;
+    }
+
+    $lesson_id = get_the_ID();
+    $course_id = get_post_meta($lesson_id, '_lp_course', true);
+
+    echo '<script>
+        jQuery(document).ready(function($) {
+            $(".eia-lesson-wrapper").attr({
+                "data-lesson-id": ' . $lesson_id . ',
+                "data-course-id": ' . $course_id . '
+            });
+        });
+    </script>';
+}
+add_action('wp_footer', 'eia_add_lesson_data_attributes');
 ?>
