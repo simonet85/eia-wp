@@ -151,11 +151,18 @@
                 `;
             });
 
-            list.html(html);
+            // Only update if content has changed (avoid visual flash)
+            const currentHtml = list.html().replace(/\s+/g, ' ').trim();
+            const newHtml = html.replace(/\s+/g, ' ').trim();
+
+            if (currentHtml !== newHtml) {
+                list.html(html);
+            }
         },
 
-        loadMessages: function(threadId) {
+        loadMessages: function(threadId, silent) {
             const self = this;
+            silent = silent || false;
 
             $.ajax({
                 url: eiaMessaging.ajaxurl,
@@ -166,39 +173,48 @@
                     thread_id: threadId
                 },
                 beforeSend: function() {
-                    $('#eia-messages-list').html('<div class="eia-loading"><i class="fas fa-circle-notch fa-spin"></i> Chargement...</div>');
-                    $('.eia-messages-placeholder').hide();
-                    $('#eia-messages-content').show();
+                    // Only show loading on initial load, not on refresh
+                    if (!silent) {
+                        $('#eia-messages-list').html('<div class="eia-loading"><i class="fas fa-circle-notch fa-spin"></i> Chargement...</div>');
+                        $('.eia-messages-placeholder').hide();
+                        $('#eia-messages-content').show();
+                    }
                 },
                 success: function(response) {
                     if (response.success) {
                         self.currentThreadId = threadId;
                         self.renderMessages(response.data.messages, response.data.recipient);
 
-                        // Mark conversation as active
-                        $('.eia-conversation-item').removeClass('active');
-                        $(`.eia-conversation-item[data-thread-id="${threadId}"]`).addClass('active');
+                        // Mark conversation as active (only on initial load)
+                        if (!silent) {
+                            $('.eia-conversation-item').removeClass('active');
+                            $(`.eia-conversation-item[data-thread-id="${threadId}"]`).addClass('active');
 
-                        // Remove unread badge
-                        $(`.eia-conversation-item[data-thread-id="${threadId}"] .eia-conversation-unread`).remove();
+                            // Remove unread badge
+                            $(`.eia-conversation-item[data-thread-id="${threadId}"] .eia-conversation-unread`).remove();
+                        }
                     }
                 }
             });
         },
 
         renderMessages: function(messages, recipient) {
-            // Render header
-            $('#eia-messages-header').html(`
+            // Render header (only if changed)
+            const headerHtml = `
                 <img src="${recipient.avatar}" alt="${recipient.name}">
                 <div class="eia-messages-header-info">
                     <h3>${recipient.name}</h3>
                 </div>
-            `);
+            `;
+            const $header = $('#eia-messages-header');
+            if ($header.html().replace(/\s+/g, ' ').trim() !== headerHtml.replace(/\s+/g, ' ').trim()) {
+                $header.html(headerHtml);
+            }
 
             // Render messages
             const list = $('#eia-messages-list');
             const currentScroll = list.scrollTop();
-            const scrollHeight = list[0].scrollHeight;
+            const scrollHeight = list[0] ? list[0].scrollHeight : 0;
             const containerHeight = list.height();
             const isScrolledToBottom = currentScroll + containerHeight >= scrollHeight - 50;
 
@@ -222,11 +238,17 @@
                 `;
             });
 
-            list.html(html);
+            // Only update if content has changed
+            const currentHtml = list.html().replace(/\s+/g, ' ').trim();
+            const newHtml = html.replace(/\s+/g, ' ').trim();
 
-            // Only auto-scroll if user was already at bottom
-            if (isScrolledToBottom) {
-                list.scrollTop(list[0].scrollHeight);
+            if (currentHtml !== newHtml) {
+                list.html(html);
+
+                // Only auto-scroll if user was already at bottom
+                if (isScrolledToBottom) {
+                    list.scrollTop(list[0].scrollHeight);
+                }
             }
         },
 
@@ -408,7 +430,8 @@
             // Poll for new messages every 10 seconds
             this.pollingInterval = setInterval(function() {
                 if (self.currentThreadId) {
-                    self.loadMessages(self.currentThreadId);
+                    // Silent refresh - no loading indicator
+                    self.loadMessages(self.currentThreadId, true);
                 }
                 self.loadConversations();
             }, 10000);

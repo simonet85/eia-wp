@@ -219,18 +219,6 @@
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
-    animation: fadeInMessage 0.2s ease-in;
-}
-
-@keyframes fadeInMessage {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .eia-message-item.own {
